@@ -8,7 +8,6 @@ import string
 import random
 from astLib import astWCS
 from astLib import astCoords as ac
-import socket
 from lofar import bdsm
 
 

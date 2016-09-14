@@ -9,9 +9,7 @@ import random
 from astLib import astWCS
 from astLib import astCoords as ac
 import socket
-if socket.gethostname() == 'vela':
-	# ATNF joy
-	from lofar import bdsm
+from lofar import bdsm
 
 
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

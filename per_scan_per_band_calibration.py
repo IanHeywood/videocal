@@ -118,7 +118,8 @@ for myms in mslist:
 			do_dE = dE_map[spw]
 			lsm_idx = lsm_map[spw]
 			mylsm = lsmlist[lsm_idx]
-			g_solint = base_g_solint*si_map[spw]			
+			g_solint = base_g_solint*si_map[spw]
+			#dE_solint = ... 
                         #scan = scanql+' && DATA_DESC_ID=='+str(spw)
 			scan = scanql # use ms_sel.ddid for spw selection
 			gainpickle = myms+'/gain_block'+str(j)+'_spw'+str(i)+'.cp'
@@ -148,7 +149,7 @@ for myms in mslist:
 							'tiggerlsm.filename='+mylsm,
 							#'do_output=CORR_RES',
 							# Solution intervals
-							#'stefcal_diffgain.timeint='+str(dE_solint),
+							#'stefcal_diffgain.timeint='+str(dE_solint), # don't uncomment this
 							'stefcal_gain.timeint='+str(g_solint),
 							# Channel selector
 							#'ms_sel.ms_channel_end='+str(uc),

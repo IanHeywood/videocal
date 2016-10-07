@@ -2,7 +2,7 @@ import numpy
 import Tigger
 import glob
 
-xx = glob.glob('*VLA18*.html')
+xx = glob.glob('*.html')
 
 for mylsm in xx:
 	oplsm = mylsm.replace('.lsm.html','_unity.lsm.html')

@@ -48,7 +48,7 @@ if not importonly:
 		os.system('mkdir pbcor')
 	else:
 		gi('Found pbcor folder')
-	imglist = glob.glob('*XMM20*.fits')	
+	imglist = glob.glob('*.fits')	
 	for infits in imglist:
 		pbcorfits = 'pbcor/'+infits.replace('.fits','_pbcor.fits')
 		if os.path.isfile(pbcorfits):

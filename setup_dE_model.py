@@ -182,8 +182,11 @@ def maskimage(infits,directions,size):
 	backup = True
 	if backup:
 		backupfits = infits+'.backup'
-		gi('Making backup: '+backupfits)
-		os.system('cp '+infits+' '+backupfits)
+		if not os.path.isfile(backupfits):
+			gi('Making backup: '+backupfits)
+			os.system('cp '+infits+' '+backupfits)
+		else:
+			ri(backupfits+' already exists, will not overwrite')
 	gi('Reading:       '+infits)
 	input_hdu = pyfits.open(infits)[0]
 	hdr = input_hdu.header

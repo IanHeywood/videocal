@@ -115,8 +115,8 @@ def mosaic_directions(fitslist,outfits):
 	return outfits
 
 
-def makeLSM(infits,mybeam,myfreq):
-	img = bdsm.process_image(infits,thresh_pix=9.0,thresh_isl=5.0,beam=mybeam,frequency=myfreq)
+def makeLSM(infits):#,mybeam,myfreq):
+	img = bdsm.process_image(infits,thresh_pix=9.0,thresh_isl=5.0)#,beam=mybeam,frequency=myfreq)
 	foundsrcs = img.write_catalog(format='ascii',catalog_type='gaul',clobber=True,incl_empty=True)
 	gaul = infits.replace('.fits','.pybdsm.gaul')
 	oplsm = gaul.replace('gaul','lsm.html')
@@ -132,6 +132,29 @@ def makeLSM(infits,mybeam,myfreq):
 		ri('Could be corrupt image, could be trouble source entering null')
 		return (oplsm,False)
 
+	
+def fixMontageHeaders(infile,outfile,axes):
+	# Images produced by Montage do not have FREQ or STOKES axes
+	# or information about the restoring beam. This confuses things like PyBDSM
+	# infile provides the keywords to be written to outfile
+	inphdu = pyfits.open(infile)
+	inphdr = inphdu[0].header
+	outhdu = pyfits.open(outfile,mode='update')
+	outhdr = outhdu[0].header
+	keywords = ['CTYPE','CRVAL','CDELT','CRPIX']
+	for axis in axes: 
+		for key in keywords:
+			inkey = key+str(axis)
+			outkey = key+str(axis)
+			afterkey = key+str(axis-1)
+			xx = inphdr[inkey]
+			outhdr.set(outkey,xx,after=afterkey)
+	outhdr.set('BUNIT',inphdr['BUNIT'],after=outkey)
+	outhdr.set('BMAJ',inphdr['BMAJ'],after='BUNIT')
+	outhdr.set('BMIN',inphdr['BMIN'],after='BMAJ')
+	outhdr.set('BPA',inphdr['BPA'],after='BMIN')
+	outhdu.flush()	
+	
 
 def tagsources(inlsm):
 	model = Tigger.load(inlsm)
@@ -386,10 +409,18 @@ if makelsms:
 				gi('Removing '+tempfile)
 				os.system('rm '+tempfile)
 
+	# Fix Montage headers
+	for chan_image in chan_images:
+		dE_img = chan_image.replace('-00','_00').replace('-image','_dE-sources')
+		fixMontageHeaders(chan_image,dE_img,[3,4])
+		
+		
 	# Find sources with a high threshold, tag LSMs with 'dE'
 	for chan in chans:
 		chan_dE_image = imgbase+'_'+chan+'_dE-sources.fits'
-		mylsm = makeLSM(chan_dE_image,(0.00125,0.00125,0.0),getfreq(1.0e9,2.0e9,chan,4))
+		# getfreq not needed anymore here because beam / freq info carried over from input
+		# images with the fixMontageHeaders step above
+		mylsm = makeLSM(chan_dE_image)#,(0.00125,0.00125,0.0),getfreq(1.0e9,2.0e9,chan,4))
 		if mylsm[1]:
 			tagsources(mylsm[0])
 			add_dummy(mylsm[0])
@@ -397,6 +428,7 @@ if makelsms:
 			ri('Writing dummy lsm to '+mylsm[0])
 			os.system('cp ../../dummy.lsm.html '+mylsm[0])
 
+			
 # Mask the model images around the troublemaker
 if maskmodels:
 	for chan_image in chan_images:

@@ -44,7 +44,7 @@ def flushFits(newimage,fitsfile):
 
 if not importonly:
 	if im1 == '' or im2 == '' or op == '':
-		print 'Please specify all required images'
+		ri('Please specify all required images')
 		sys.exit(-1)
 	else:
 		print 'Adding:'
